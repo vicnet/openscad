@@ -35,6 +35,8 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 
+#define foreach BOOST_FOREACH
+
 Expression::Expression() : recursioncount(0)
 {
 }
@@ -73,6 +75,21 @@ public:
 private:
 	const Expression &expr;
 };
+
+Value vector_search(const Value& v, const std::string& var_name)
+{
+std::cout << "find " << var_name << " in " << v.toString() << std::endl;
+	foreach (const Value& assoc, v.toVector()) {
+		std::cout << "  test " << assoc.toString() << std::endl;
+		const std::vector<Value>& elems = assoc.toVector();
+		std::cout << "  compare " << elems[0].toString() << std::endl;
+		if (var_name == elems[0].toString()) {
+			std::cout << "  return " << elems[1].toString() << std::endl;
+			return elems[1];
+		}
+	}
+	return Value();
+}
 
 Value Expression::evaluate(const Context *context) const
 {
@@ -143,6 +160,8 @@ Value Expression::evaluate(const Context *context) const
 			return v[1];
 		if (v.type() == Value::VECTOR && this->var_name == "z")
 			return v[2];
+		if (v.type() == Value::VECTOR)
+			return vector_search(v,var_name);
 
 		if (v.type() == Value::RANGE && this->var_name == "begin")
 			return Value(v[0]);
