@@ -68,6 +68,7 @@ void Builtins::initialize()
 	this->deprecations["import_stl"] = "import";
 	this->deprecations["import_dxf"] = "import";
 	this->deprecations["import_off"] = "import";
+	this->deprecations["child"] = "children";
 }
 
 std::string Builtins::isDeprecated(const std::string &name)
