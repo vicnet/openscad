@@ -144,12 +144,16 @@ Value Expression::evaluate(const Context *context) const
 		if (v.type() == Value::VECTOR && this->var_name == "z")
 			return v[2];
 
-		if (v.type() == Value::RANGE && this->var_name == "begin")
-			return Value(v[0]);
-		if (v.type() == Value::RANGE && this->var_name == "step")
-			return Value(v[1]);
-		if (v.type() == Value::RANGE && this->var_name == "end")
-			return Value(v[2]);
+		if (v.type() == Value::RANGE) {
+			Value::RangeType r = v.toRange();
+			if (var_name == "begin")
+				return r.begin;
+			if (var_name == "step")
+				return r.step;
+			if (var_name == "end")
+				return r.end;
+			return Value();
+		}
 
 		return Value();
 	}
