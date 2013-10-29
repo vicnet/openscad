@@ -62,7 +62,8 @@ class AbstractModule
 {
 public:
 	virtual ~AbstractModule();
-	virtual class AbstractNode *instantiate(const Context *ctx, const ModuleInstantiation *inst, const class EvalContext *evalctx = NULL) const;
+	virtual AbstractNode *instantiate(const Context *ctx, const ModuleInstantiation *inst, const class EvalContext *evalctx = NULL) const;
+    virtual Value evaluate(const class Context *ctx, const class EvalContext *evalctx) const;
 	virtual std::string dump(const std::string &indent, const std::string &name) const;
 };
 
@@ -73,6 +74,7 @@ public:
 	virtual ~Module();
 
 	virtual AbstractNode *instantiate(const Context *ctx, const ModuleInstantiation *inst, const EvalContext *evalctx = NULL) const;
+    virtual Value evaluate(const class Context *ctx, const class EvalContext *evalctx) const;
 	virtual std::string dump(const std::string &indent, const std::string &name) const;
 	static const std::string& stack_element(int n) { return module_stack[n]; };
 	static int stack_size() { return module_stack.size(); };
