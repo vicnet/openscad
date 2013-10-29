@@ -78,13 +78,9 @@ private:
 
 Value vector_search(const Value& v, const std::string& var_name)
 {
-std::cout << "find " << var_name << " in " << v.toString() << std::endl;
 	foreach (const Value& assoc, v.toVector()) {
-		std::cout << "  test " << assoc.toString() << std::endl;
 		const std::vector<Value>& elems = assoc.toVector();
-		std::cout << "  compare " << elems[0].toString() << std::endl;
 		if (var_name == elems[0].toString()) {
-			std::cout << "  return " << elems[1].toString() << std::endl;
 			return elems[1];
 		}
 	}

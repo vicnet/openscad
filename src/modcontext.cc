@@ -129,6 +129,16 @@ AbstractNode *ModuleContext::instantiate_module(const ModuleInstantiation &inst,
 	return Context::instantiate_module(inst, evalctx);
 }
 
+// virtual
+Value ModuleContext::lookup_variable(const std::string& name, bool silent) const
+{
+    const AbstractModule* foundm = this->findLocalModule(name);
+    if (foundm) {
+        return foundm->evaluate(this,NULL);
+    }
+    return Context::lookup_variable(name,silent);
+}
+
 #ifdef DEBUG
 void ModuleContext::dump(const AbstractModule *mod, const ModuleInstantiation *inst)
 {

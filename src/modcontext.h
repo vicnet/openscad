@@ -24,6 +24,8 @@ public:
 	virtual AbstractNode *instantiate_module(const ModuleInstantiation &inst, 
 																					 const EvalContext *evalctx) const;
 
+    virtual  Value lookup_variable(const std::string &name, bool silent = false) const;
+
 	const AbstractModule *findLocalModule(const std::string &name) const;
 	const AbstractFunction *findLocalFunction(const std::string &name) const;
 

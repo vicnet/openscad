@@ -41,6 +41,10 @@ namespace fs = boost::filesystem;
 #include <sstream>
 #include <sys/stat.h>
 
+
+#define foreach BOOST_FOREACH
+
+
 AbstractModule::~AbstractModule()
 {
 }
@@ -54,6 +58,12 @@ AbstractNode *AbstractModule::instantiate(const Context *ctx, const ModuleInstan
 	node->children = inst->instantiateChildren(evalctx);
 
 	return node;
+}
+
+// virtual
+Value AbstractModule::evaluate(const class Context *, const class EvalContext *) const
+{
+    return Value();
 }
 
 std::string AbstractModule::dump(const std::string &indent, const std::string &name) const
@@ -193,6 +203,19 @@ AbstractNode *Module::instantiate(const Context *ctx, const ModuleInstantiation 
 	node->children.insert(node->children.end(), instantiatednodes.begin(), instantiatednodes.end());
 
 	return node;
+}
+
+// virtual
+Value Module::evaluate(const class Context *context, const class EvalContext *) const
+{
+    Value::VectorType dict;
+    foreach (const Assignment &arg, scope.assignments) {
+        Value::VectorType elem;
+        elem.push_back(Value(arg.first));
+        elem.push_back(arg.second->evaluate(context));
+        dict.push_back(elem);
+    }
+    return Value(dict);
 }
 
 std::string Module::dump(const std::string &indent, const std::string &name) const
