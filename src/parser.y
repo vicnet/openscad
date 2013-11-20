@@ -210,6 +210,16 @@ module_instantiation:
                 delete $2;
                 $$ = NULL;
             }
+        | TOK_ID '.' single_module_instantiation
+            {
+                $<inst>$ = $3;
+                scope_stack.push(&$3->scope);
+            }
+          child_statement
+            {
+                scope_stack.pop();
+                $$ = $<inst>4;
+            }
         | single_module_instantiation
             {
                 $<inst>$ = $1;
