@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <limits>
+#include <boost/cstdint.hpp>
 
 // Workaround for https://bugreports.qt-project.org/browse/QTBUG-22829
 #ifndef Q_MOC_RUN
@@ -86,7 +87,7 @@ public:
 
     /// return number of steps, max uint32_ value if step is 0
     uint32_t nbsteps() const;
-    
+
     friend class tostring_visitor;
     friend class bracket_visitor;
   };

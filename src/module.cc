@@ -320,3 +320,24 @@ AbstractNode *FileModule::instantiate(const Context *ctx, const ModuleInstantiat
 
 	return node;
 }
+
+// virtual
+AbstractNode* NamespaceInstantiation::evaluate(const Context *ctx) const
+{
+	const ModuleContext* modc = dynamic_cast<const ModuleContext*>(ctx);
+	if (modc!=NULL) {
+		const Module* mod = dynamic_cast<const Module*>(modc->findLocalModule(modname)); // n
+		if (mod!=NULL) {
+			std::cout << "Module trouvé" << std::endl;
+			ModuleContext c(ctx);
+			c.initializeModule(*mod);
+			return _module->evaluate(&c);
+		}
+	}
+	return _module->evaluate(ctx);
+}
+// virtual
+std::string NamespaceInstantiation::dump(const std::string &indent) const
+{
+	return modname + "::" + _module->dump(indent);
+}

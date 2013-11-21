@@ -212,7 +212,8 @@ module_instantiation:
             }
         | TOK_ID '.' single_module_instantiation
             {
-                $<inst>$ = $3;
+                $<inst>$ = new NamespaceInstantiation($1,$3);
+                free($1);
                 scope_stack.push(&$3->scope);
             }
           child_statement

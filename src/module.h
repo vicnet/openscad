@@ -22,7 +22,7 @@ public:
 	virtual ~ModuleInstantiation();
 
 	virtual std::string dump(const std::string &indent) const;
-	class AbstractNode *evaluate(const class Context *ctx) const;
+	virtual AbstractNode *evaluate(const Context *ctx) const;
 	std::vector<AbstractNode*> instantiateChildren(const Context *evalctx) const;
 
 	void setPath(const std::string &path) { this->modpath = path; }
@@ -47,6 +47,18 @@ protected:
 
 	friend class Module;
 };
+
+class NamespaceInstantiation : public ModuleInstantiation {
+public:
+	NamespaceInstantiation(const std::string& name, ModuleInstantiation* module)
+		: ModuleInstantiation(name)
+		, _module(module)
+		{ }
+	virtual AbstractNode* evaluate(const Context *ctx) const;
+	virtual std::string dump(const std::string &indent) const;
+protected:
+	ModuleInstantiation* _module;
+}; // NamespaceInstantiation
 
 class IfElseModuleInstantiation : public ModuleInstantiation {
 public:

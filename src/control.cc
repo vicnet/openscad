@@ -78,14 +78,14 @@ void ControlModule::for_eval(AbstractNode &node, const ModuleInstantiation &inst
 		Context c(ctx);
 		if (it_values.type() == Value::RANGE) {
 			Value::RangeType range = it_values.toRange();
-                        uint32_t steps = range.nbsteps();
-                        if (steps >= 10000) {
-                                PRINTB("WARNING: Bad range parameter in for statement: too many elements (%lu).", steps);
-                        } else {
-                            for (Value::RangeType::iterator it = range.begin();it != range.end();it++) {
-                                c.set_variable(it_name, Value(*it));
-                                for_eval(node, inst, l+1, &c, evalctx);
-                            }
+			uint32_t steps = range.nbsteps();
+			if (steps >= 10000) {
+					PRINTB("WARNING: Bad range parameter in for statement: too many elements (%lu).", steps);
+			} else {
+				for (Value::RangeType::iterator it = range.begin(); it != range.end(); ++it) {
+					c.set_variable(it_name, Value(*it));
+					for_eval(node, inst, l+1, &c, evalctx);
+				}
 			}
 		}
 		else if (it_values.type() == Value::VECTOR) {
