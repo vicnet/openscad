@@ -5,8 +5,8 @@
 #include <vector>
 #include <list>
 #include <deque>
+#include <set>
 #include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
 #include <time.h>
 #include <sys/stat.h>
 
@@ -114,8 +114,24 @@ public:
 	bool hasIncludes() const { return !this->includes.empty(); }
 	bool usesLibraries() const { return !this->usedlibs.empty(); }
 	bool isHandlingDependencies() const { return this->is_handling_dependencies; }
+	void addLibrary(const std::string& path, const std::string& nspace) {
+		Library library;
+		library.path = path;
+		library.nspace = nspace;
+		usedlibs.insert(library);
+	}
 
-	typedef boost::unordered_set<std::string> ModuleContainer;
+	struct Library {
+		std::string path;
+		std::string nspace;
+		bool operator<(const Library& ref) const {
+			if (path<ref.path) return true;
+			if (path>ref.path) return false;
+			if (nspace<ref.nspace) return true;
+			return false;
+		}
+	};
+	typedef std::set<Library> ModuleContainer;
 	ModuleContainer usedlibs;
 private:
 	struct IncludeFile {

@@ -111,18 +111,20 @@ include[ \t\r\n>]*"<"	{ BEGIN(cond_include); filepath = filename = ""; }
 use[ \t\r\n>]*"<"	{ BEGIN(cond_use); }
 <cond_use>{
 [^\t\r\n>]+	{ filename = yytext; }
- ">"		{ 
-	BEGIN(INITIAL); 
-        fs::path fullpath = find_valid_path(sourcepath(), fs::path(filename), &openfilenames);
-	if (fullpath.empty()) {
-          PRINTB("WARNING: Can't open library '%s'.", filename);
-          parserlval.text = strdup(filename.c_str());
-	} else {
-          handle_dep(fullpath.string());
-          parserlval.text = strdup(fullpath.string().c_str());
+ ">" { 
+		BEGIN(INITIAL); 
+		fs::path fullpath = find_valid_path(sourcepath(), fs::path(filename), &openfilenames);
+		parserlval.nspace = new YYSTYPE::Namespace();
+		if (fullpath.empty()) {
+			PRINTB("WARNING: Can't open library '%s'.", filename);
+			parserlval.nspace->path = filename;
+		} else {
+			handle_dep(fullpath.string());
+			parserlval.nspace->path = fullpath.string();
+		}
+		parserlval.nspace->name = filename;
+		return TOK_USE;
 	}
-        return TOK_USE;
-    }
 }
 
 <<EOF>> {

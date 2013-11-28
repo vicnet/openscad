@@ -78,6 +78,10 @@ std::string parser_source_path;
   class IfElseModuleInstantiation *ifelse;
   Assignment *arg;
   AssignmentList *args;
+  struct Namespace {
+	std::string path;
+	std::string name;
+  }* nspace;
 }
 
 %token TOK_MODULE
@@ -129,7 +133,10 @@ std::string parser_source_path;
 
 input:    /* empty */
         | TOK_USE
-            { rootmodule->usedlibs.insert($1); }
+            {
+                rootmodule->addLibrary($<nspace>1->path, $<nspace>1->name);
+                delete $1;
+            }
           input
         | statement input
         ;

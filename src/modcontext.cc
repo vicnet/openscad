@@ -5,6 +5,7 @@
 #include "printutils.h"
 #include "builtin.h"
 #include "ModuleCache.h"
+#include "evalcontext.h"
 
 #include <boost/foreach.hpp>
 
@@ -162,7 +163,7 @@ void ModuleContext::dump(const AbstractModule *mod, const ModuleInstantiation *i
 #endif
 
 FileContext::FileContext(const class FileModule &module, const Context *parent)
-	: usedlibs(module.usedlibs), ModuleContext(parent)
+	: ModuleContext(parent), usedlibs(module.usedlibs)
 {
 	if (!module.modulePath().empty()) this->document_path = module.modulePath();
 }
@@ -172,9 +173,9 @@ Value FileContext::evaluate_function(const std::string &name, const EvalContext 
 	const AbstractFunction *foundf = findLocalFunction(name);
 	if (foundf) return foundf->evaluate(this, evalctx);
 	
-	BOOST_FOREACH(const FileModule::ModuleContainer::value_type &m, this->usedlibs) {
+	BOOST_FOREACH(const FileModule::ModuleContainer::value_type& m, this->usedlibs) {
 		// usedmod is NULL if the library wasn't be compiled (error or file-not-found)
-		FileModule *usedmod = ModuleCache::instance()->lookup(m);
+		FileModule *usedmod = ModuleCache::instance()->lookup(m.path);
 		if (usedmod && 
 				usedmod->scope.functions.find(name) != usedmod->scope.functions.end()) {
 			FileContext ctx(*usedmod, this->parent);
@@ -193,11 +194,13 @@ Value FileContext::evaluate_function(const std::string &name, const EvalContext 
 
 AbstractNode *FileContext::instantiate_module(const ModuleInstantiation &inst, const EvalContext *evalctx) const
 {
-	const AbstractModule *foundm = this->findLocalModule(inst.name());
-	if (foundm) return foundm->instantiate(this, &inst, evalctx);
-
+	if (evalctx->getNamespace().empty()) {
+		const AbstractModule *foundm = this->findLocalModule(inst.name());
+		if (foundm) return foundm->instantiate(this, &inst, evalctx);
+	}
 	BOOST_FOREACH(const FileModule::ModuleContainer::value_type &m, this->usedlibs) {
-		FileModule *usedmod = ModuleCache::instance()->lookup(m);
+		if (m.nspace.find(evalctx->getNamespace())==std::string::npos) continue;
+		FileModule *usedmod = ModuleCache::instance()->lookup(m.path);
 		// usedmod is NULL if the library wasn't be compiled (error or file-not-found)
 		if (usedmod && 
 				usedmod->scope.modules.find(inst.name()) != usedmod->scope.modules.end()) {
@@ -211,6 +214,5 @@ AbstractNode *FileContext::instantiate_module(const ModuleInstantiation &inst, c
 			return usedmod->scope.modules[inst.name()]->instantiate(&ctx, &inst, evalctx);
 		}
 	}
-
-	return ModuleContext::instantiate_module(inst, evalctx);
+	return Context::instantiate_module(inst, evalctx);
 }

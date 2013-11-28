@@ -12,9 +12,12 @@ class EvalContext : public Context
 public:
 	typedef std::vector<class ModuleInstantiation *> InstanceList;
 
-	EvalContext(const Context *parent, 
-							const AssignmentList &args, const class LocalScope *const scope = NULL)
-		: Context(parent), eval_arguments(args), scope(scope) {}
+	EvalContext(const Context *parent
+			  , const AssignmentList &args, const class LocalScope *const scope = NULL
+			  , const std::string& anamespace = "")
+		: Context(parent), eval_arguments(args), scope(scope)
+		, _namespace(anamespace)
+	{ }
 	virtual ~EvalContext() {}
 
 	size_t numArgs() const { return this->eval_arguments.size(); }
@@ -23,6 +26,10 @@ public:
 
 	size_t numChildren() const;
 	ModuleInstantiation *getChild(size_t i) const;
+	
+	const std::string& getNamespace() const {
+		return _namespace;
+	}
 
 #ifdef DEBUG
 	virtual void dump(const class AbstractModule *mod, const ModuleInstantiation *inst);
@@ -32,6 +39,7 @@ private:
 	const AssignmentList &eval_arguments;
 	std::vector<std::pair<std::string, Value> > eval_values;
 	const LocalScope *const scope;
+	std::string _namespace;
 };
 
 #endif

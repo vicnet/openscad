@@ -276,7 +276,7 @@ bool FileModule::handleDependencies()
 
 		bool wasmissing = false;
 		// Get an absolute filename for the module
-		std::string filename = *curr;
+		std::string filename = curr->path;
 		if (!boosty::is_absolute(filename)) {
 			wasmissing = true;
 			fs::path fullpath = find_valid_path(this->path, filename);
@@ -324,6 +324,10 @@ AbstractNode *FileModule::instantiate(const Context *ctx, const ModuleInstantiat
 // virtual
 AbstractNode* NamespaceInstantiation::evaluate(const Context *ctx) const
 {
+// code in ModuleInstantiation::evaluate(const Context *ctx)
+//	EvalContext c(ctx, this->arguments, &this->scope);
+//	AbstractNode *node = ctx->instantiate_module(*this, &c); // Passes c as evalctx
+/*
 	const ModuleContext* modc = dynamic_cast<const ModuleContext*>(ctx);
 	if (modc!=NULL) {
 		const Module* mod = dynamic_cast<const Module*>(modc->findLocalModule(modname)); // n
@@ -335,6 +339,13 @@ AbstractNode* NamespaceInstantiation::evaluate(const Context *ctx) const
 		}
 	}
 	return _module->evaluate(ctx);
+*/
+	EvalContext c(ctx, _module->arguments, &_module->scope, modname);
+#if 0 && DEBUG
+	PRINT("New eval ctx:");
+	c.dump(NULL, this);
+#endif
+	return ctx->instantiate_module(*_module, &c); // Passes c as evalctx
 }
 // virtual
 std::string NamespaceInstantiation::dump(const std::string &indent) const
